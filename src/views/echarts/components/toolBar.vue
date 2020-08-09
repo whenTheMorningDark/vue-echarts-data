@@ -22,7 +22,7 @@
           </el-tab-pane>
         </el-tabs>
         <div class="toolbar-item" slot="reference">
-          <SvgIcon iconClass="tubiao" class="icon-item"></SvgIcon>
+          <i class="el-icon-s-operation"></i>
         </div>
       </el-popover>
     </div>
@@ -42,7 +42,6 @@
 </template>
 
 <script>
-import SvgIcon from "@/components/SvgIcon";
 import { barChildren } from "../echartComponent/data/bar/index";
 import { lineChildren } from "../echartComponent/data/line/index";
 import { pieChildren } from "../echartComponent/data/pie/index";
@@ -57,7 +56,6 @@ export default {
     }
   },
   components: {
-    SvgIcon
   },
   data () {
     return {
@@ -103,6 +101,9 @@ export default {
     width: 32px;
     height: 32px;
     margin-right: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     .icon-item {
       width: 100%;
       height: 100%;
