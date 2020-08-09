@@ -3,7 +3,16 @@
     <div class="left-container">
       <toolbar :rightBtn="rightBtn" :targetFunScreen="targetFunScreen"></toolbar>
       <div class="add-wrapper" @drop="drop" @dragover="allowDrop" ref="addWrapper" id="addWrapper">
-        <resizeBox
+        <recursionItem
+          :listData="resizeBox"
+          ref="recursionItem"
+          @onActivated="onActivated"
+          @handleContextmenu="handleContextmenu"
+          @onResize="onResize"
+          @delFun="delFun"
+          @onDrag="onDragFun"
+        ></recursionItem>
+        <!-- <resizeBox
           :item="item"
           v-for="item in resizeBox"
           :key="item.id"
@@ -14,7 +23,7 @@
           @onActivated="onActivated"
         >
           <echartTemplate :id="item.id" ref="echartComponent" :optionsData="item.optionsData"></echartTemplate>
-        </resizeBox>
+        </resizeBox>-->
       </div>
     </div>
     <div class="right-container">
@@ -24,8 +33,9 @@
 </template>
 <script>
 import toolbar from "./components/toolBar";
-import echartTemplate from "./echartComponent/echartTemplate";
-import resizeBox from "./components/resizeBox";
+// import echartTemplate from "./echartComponent/echartTemplate";
+// import resizeBox from "./components/resizeBox";
+import recursionItem from "./components/recursionItem"
 import { randomStr } from "@/utils";
 import rightTool from "./rightTool/index";
 import History from "./utils/history";
@@ -35,9 +45,10 @@ export default {
   mixins: [event],
   components: {
     toolbar,
-    echartTemplate,
-    resizeBox,
-    rightTool
+    // echartTemplate,
+    // resizeBox,
+    rightTool,
+    recursionItem
   },
   provide () {
     return {
@@ -69,7 +80,25 @@ export default {
       ],
       flag: false,
       currentItem: {}, // 当前的对象
-      targetFunScreen: null
+      targetFunScreen: null,
+      // listData: [
+      //   {
+      //     children: [
+      //       { width: 100, height: 50, id: 2, pid: 1, x: 50, y: 50 },
+      //       { width: 100, height: 50, id: 3, pid: 1, x: 170, y: 50 },
+      //       { width: 100, height: 50, id: 4, pid: 1, x: 300, y: 50 }
+      //     ],
+      //     color: "red",
+      //     width: 500,
+      //     height: 300,
+      //     background: "red",
+      //     id: 1,
+      //     pid: null,
+      //     x: 50,
+      //     y: 50
+      //   },
+      // ]
+
     };
   },
   methods: {
@@ -88,7 +117,9 @@ export default {
       let styleOption = { x: x - elex, y: y - eley, id: uid, optionsData: data.optionsData };
       let boxOptions = Object.assign({ x: 0, y: 0, width: 300, height: 300 }, styleOption);
       let id = await this.createEchart(boxOptions);
-      let echartsComponents = this.$refs.echartComponent;
+      console.log(id)
+      console.log(this.$refs.recursionItem.getEchartComponents())
+      let echartsComponents = this.$refs.recursionItem.getEchartComponents()
       let targetEchart = echartsComponents.find(v => v.id === id);
       this.$store.commit("echart/setEchartArr", echartsComponents); // 设置当前echart对象集合
       targetEchart.resizeFun();
@@ -112,7 +143,8 @@ export default {
         }
         if (this.currentId.length === 0 || this.currentId !== data.id || this.targetEchart === null) {
           this.currentId = data.id;
-          this.targetEchart = this.$refs.echartComponent.find(v => v.id === data.id);
+          let echartsComponents = this.$refs.recursionItem.getEchartComponents()
+          this.targetEchart = echartsComponents.find(v => v.id === data.id);
         }
         this.targetEchart.resizeFun();
         this.stack.setState(this.resizeBox); // 设置历史记录
@@ -131,7 +163,8 @@ export default {
       this.$store.commit("echart/setCurrentTarget", data);
     },
     // 删除的方法
-    delFun () {
+    delFun (item) {
+      console.log(item)
       // console.log(this.currentSelectArr);
       // let ids = this.currentSelectArr.map(v => v.id) || [];
       this.resizeBox = this.resizeBox.filter(v => !v.active);
@@ -165,9 +198,10 @@ export default {
     },
     // 菜单事件
     handleContextmenu (item) {
-      console.log(item);
-      console.log(this.currentSelectArr);
-      // this.currentItem = item;
+      // console.log(item);
+      // console.log(this.currentSelectArr);
+      this.currentItem = item;
+      this.$set(item, "active", true)
       // let filterArr = this.resizeBox.filter(v => v.id !== this.currentItem.id);
       // filterArr.forEach(v => {
       //   this.$set(v, "active", false);
@@ -205,6 +239,7 @@ export default {
         console.log(e.button === 1);
         if (e.target.tagName === "CANVAS" && e.button === 0) { // 点击是图形的情况
           console.log("点击是图形的情况");
+          console.log(this.currentItem)
           let filterArr = this.resizeBox.filter(v => v.id !== this.currentItem.id);
           filterArr.forEach(v => {
             this.$set(v, "active", false);
