@@ -11,19 +11,9 @@
           @onResize="onResize"
           @delFun="delFun"
           @onDrag="onDragFun"
+          :isGroupDisable="isGroupDisable"
+          @group="groupFun"
         ></recursionItem>
-        <!-- <resizeBox
-          :item="item"
-          v-for="item in resizeBox"
-          :key="item.id"
-          @onResize="onResize"
-          @delFun="delFun"
-          @onDrag="onDragFun"
-          @handleContextmenu="handleContextmenu"
-          @onActivated="onActivated"
-        >
-          <echartTemplate :id="item.id" ref="echartComponent" :optionsData="item.optionsData"></echartTemplate>
-        </resizeBox>-->
       </div>
     </div>
     <div class="right-container">
@@ -33,20 +23,17 @@
 </template>
 <script>
 import toolbar from "./components/toolBar";
-// import echartTemplate from "./echartComponent/echartTemplate";
-// import resizeBox from "./components/resizeBox";
 import recursionItem from "./components/recursionItem"
 import { randomStr } from "@/utils";
 import rightTool from "./rightTool/index";
 import History from "./utils/history";
 import event from "./utils/event";
+import menu from "./utils/menu"
 export default {
   name: "echarts",
-  mixins: [event],
+  mixins: [event, menu],
   components: {
     toolbar,
-    // echartTemplate,
-    // resizeBox,
     rightTool,
     recursionItem
   },
@@ -56,8 +43,11 @@ export default {
     };
   },
   computed: {
-    currentSelectArr () {
-      return this.resizeBox.filter(v => v.active);
+    isGroupDisable () { // 是否禁用gruop菜单项
+      return this.currentSelectData.length <= 1;
+    },
+    currentSelectData () { // 当前选择的元素
+      return this.resizeBox.filter(v => v.active)
     }
   },
   created () {
@@ -80,25 +70,7 @@ export default {
       ],
       flag: false,
       currentItem: {}, // 当前的对象
-      targetFunScreen: null,
-      // listData: [
-      //   {
-      //     children: [
-      //       { width: 100, height: 50, id: 2, pid: 1, x: 50, y: 50 },
-      //       { width: 100, height: 50, id: 3, pid: 1, x: 170, y: 50 },
-      //       { width: 100, height: 50, id: 4, pid: 1, x: 300, y: 50 }
-      //     ],
-      //     color: "red",
-      //     width: 500,
-      //     height: 300,
-      //     background: "red",
-      //     id: 1,
-      //     pid: null,
-      //     x: 50,
-      //     y: 50
-      //   },
-      // ]
-
+      targetFunScreen: null // 全屏展开的dom对象
     };
   },
   methods: {
@@ -117,8 +89,6 @@ export default {
       let styleOption = { x: x - elex, y: y - eley, id: uid, optionsData: data.optionsData };
       let boxOptions = Object.assign({ x: 0, y: 0, width: 300, height: 300 }, styleOption);
       let id = await this.createEchart(boxOptions);
-      console.log(id)
-      console.log(this.$refs.recursionItem.getEchartComponents())
       let echartsComponents = this.$refs.recursionItem.getEchartComponents()
       let targetEchart = echartsComponents.find(v => v.id === id);
       this.$store.commit("echart/setEchartArr", echartsComponents); // 设置当前echart对象集合
@@ -281,7 +251,7 @@ export default {
     .add-wrapper {
       // width: 220px;
       width: 100%;
-      height: calc(100% - 30px);
+      height: calc(100% - 45px);
       position: relative;
     }
   }

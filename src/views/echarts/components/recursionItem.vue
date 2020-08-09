@@ -14,8 +14,9 @@
       v-contextmenu:contextmenu
       @dragging="onDrag"
       @resizing="onResize"
+      :class="parentCls(item)"
     >
-      <slot>
+      <slot v-if="item.optionsData">
         <echartComponent :id="item.id" ref="echartComponent" :optionsData="item.optionsData"></echartComponent>
       </slot>
       <div v-if="item.children">
@@ -23,6 +24,7 @@
       </div>
       <v-contextmenu ref="contextmenu" @contextmenu="handleContextmenu(item)">
         <v-contextmenu-item @click="delFun(item)">删除</v-contextmenu-item>
+        <v-contextmenu-item @click="group" :disabled="isGroupDisable">组合</v-contextmenu-item>
       </v-contextmenu>
     </vdr>
   </div>
@@ -35,6 +37,10 @@ export default {
     listData: {
       type: Array,
       default: () => []
+    },
+    isGroupDisable: {
+      type: Boolean,
+      default: true
     }
   },
   name: "TreeList",
@@ -49,6 +55,17 @@ export default {
     }
   },
   methods: {
+    // 组合方法
+    group () {
+      // console.log("group")
+      this.$emit("group")
+    },
+    parentCls (item) {
+      if (!item.optionsData) {
+        return "parentCls"
+      }
+      return "childCls"
+    },
     getEchartComponents () {
       return this.$refs.echartComponent
     },
@@ -87,10 +104,15 @@ export default {
 
 <style lang="scss" scoped>
 .tree-box {
-  margin: 20px auto;
-  display: flex;
+  /* display: flex; */
+  position: absolute;
+  left: 0;
+  top: 0;
 }
 .item {
   padding: 10px;
+}
+.parentCls {
+  background: red;
 }
 </style>

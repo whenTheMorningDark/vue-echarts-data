@@ -112,6 +112,9 @@ export default {
 		},
 		setOption(optionsData) {
 			console.log(optionsData);
+			if (!optionsData) {
+				return;
+			}
 			this.myChart.setOption(optionsData);
 		},
 		init() {
