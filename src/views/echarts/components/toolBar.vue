@@ -35,8 +35,7 @@
         :icon="item.icon"
         @click="item.func"
       >{{item.text}}</el-button>
-      <!-- <el-button type="defult" size="mini" icon="el-icon-refresh-right">撤回</el-button>
-      <el-button type="defult" size="mini" icon="el-icon-refresh-left">前进</el-button>-->
+      <ScreenFull :targetFunScreen="targetFunScreen" v-if="isShowScreenFull"></ScreenFull>
     </div>
   </div>
 </template>
@@ -47,15 +46,24 @@ import { lineChildren } from "../echartComponent/data/line/index";
 import { pieChildren } from "../echartComponent/data/pie/index";
 import { scatterChildren } from "../echartComponent/data/scatter/index";
 import { radarChildren } from "../echartComponent/data/radar/index";
+import ScreenFull from "@/components/ScreenFull"
 export default {
   name: "echartToolbar",
   props: {
     rightBtn: {
       type: Array,
       default: () => []
+    },
+    targetFunScreen: { // 全屏的节点
+      type: [Object, HTMLDivElement],
+    },
+    isShowScreenFull: { // 是否显示全屏按钮
+      type: Boolean,
+      default: true
     }
   },
   components: {
+    ScreenFull
   },
   data () {
     return {
@@ -66,16 +74,15 @@ export default {
         { name: "scatter", label: "散点图", children: scatterChildren },
         { name: "radar", label: "雷达图", children: radarChildren },
       ],
-      activeName: "bar"
+      activeName: "bar",
     };
+  },
+  mounted () {
   },
   methods: {
     drag (e, element) {
       e.dataTransfer.setData("data", JSON.stringify(element));
     }
-  },
-  mounted () {
-    console.log(scatterChildren);
   }
 
 };

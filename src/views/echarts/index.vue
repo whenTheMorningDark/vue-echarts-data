@@ -1,8 +1,8 @@
 <template>
   <div class="echarts-wrapper">
     <div class="left-container">
-      <toolbar :rightBtn="rightBtn"></toolbar>
-      <div class="add-wrapper" @drop="drop" @dragover="allowDrop" ref="addWrapper">
+      <toolbar :rightBtn="rightBtn" :targetFunScreen="targetFunScreen"></toolbar>
+      <div class="add-wrapper" @drop="drop" @dragover="allowDrop" ref="addWrapper" id="addWrapper">
         <resizeBox
           :item="item"
           v-for="item in resizeBox"
@@ -49,6 +49,12 @@ export default {
       return this.resizeBox.filter(v => v.active);
     }
   },
+  created () {
+    this.$nextTick(() => {
+      // console.log(document.getElementById("addWrapper"))
+      this.targetFunScreen = document.getElementById("addWrapper")
+    })
+  },
   data () {
     return {
       resizeBox: [],
@@ -58,16 +64,19 @@ export default {
       rightBtn: [ // toolbar右侧按钮
         { text: "回撤", icon: "el-icon-refresh-right", func: this.cancelFun },
         { text: "前进", icon: "el-icon-refresh-left", func: this.uncancel },
-        { text: "全选", icon: "el-icon-crop", func: this.selectAllFun }
+        { text: "全选", icon: "el-icon-crop", func: this.selectAllFun },
+        { text: "全不选", icon: "el-icon-crop", func: this.cancelSelectAllFun }
       ],
       flag: false,
-      currentItem: {} // 当前的对象
+      currentItem: {}, // 当前的对象
+      targetFunScreen: null
     };
   },
   methods: {
     allowDrop (ev) {
       ev.preventDefault();
     },
+    // 放置后触发事件
     async drop (ev) {
       let ele = this.$refs.addWrapper;
       let elex = ele.getBoundingClientRect().x;
@@ -84,6 +93,7 @@ export default {
       this.$store.commit("echart/setEchartArr", echartsComponents); // 设置当前echart对象集合
       targetEchart.resizeFun();
     },
+    // 创建图形
     createEchart (boxOptions) {
       return new Promise((resolve => {
         this.resizeBox.push({
@@ -168,11 +178,17 @@ export default {
     },
     // 全选
     selectAllFun () {
-      this.flag = !this.flag;
+      // this.flag = !this.flag;
+      this.resizeBox.forEach(v => {
+        this.$set(v, "active", true);
+      });
+      console.log(this.resizeBox);
+    },
+    // 全不选
+    cancelSelectAllFun () {
       this.resizeBox.forEach(v => {
         this.$set(v, "active", false);
       });
-      console.log(this.resizeBox);
     },
     // 点击addWrapper状态都为false,点击当前resizeBox的active则为true,其它为false
     addWrapperMouseDownFun (e) { // 如果是ctrl+左健的情况
