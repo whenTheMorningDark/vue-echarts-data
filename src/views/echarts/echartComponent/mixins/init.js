@@ -108,6 +108,7 @@ export default {
 	},
 	methods: {
 		resizeFun() {
+			console.log(this.myChart);
 			this.myChart.resize();
 		},
 		setOption(optionsData) {
@@ -123,6 +124,7 @@ export default {
 		},
 	},
 	mounted() {
+		console.log("xxx");
 		this.init();
 	},
 };

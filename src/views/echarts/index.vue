@@ -130,6 +130,7 @@ export default {
     // 选中元素
     onActivated (data) {
       this.currentItem = data;
+      console.log(data)
       this.$store.commit("echart/setCurrentTarget", data);
     },
     // 删除的方法

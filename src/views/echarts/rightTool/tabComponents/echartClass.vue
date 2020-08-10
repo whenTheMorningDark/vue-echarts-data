@@ -55,8 +55,9 @@ export default {
         //   return;
         // }
         console.log("出发");
+        let data = nVal.optionsData ? nVal : {}
         this.$nextTick(() => {
-          this.$refs.baseAttr[0].setData(nVal);
+          this.$refs.baseAttr[0].setData(data);
           let mapComponent = {
             titleComponents: "title",
             legendComponents: "legend",
@@ -64,7 +65,7 @@ export default {
             yComponents: "yAxis"
           };
           for (let key in mapComponent) {
-            this.setData(nVal, key, mapComponent[key]);
+            this.setData(data, key, mapComponent[key]);
           }
         });
       }

@@ -1,7 +1,7 @@
 <template>
   <div class="tree-box">
     <vdr
-      v-for="item of listData"
+      v-for="item of treeData"
       :w="item.width"
       :h="item.height"
       :x="item.x"
@@ -15,9 +15,17 @@
       @dragging="onDrag"
       @resizing="onResize"
       :class="parentCls(item)"
+      ref="vdr"
     >
-      <slot v-if="item.optionsData">
-        <echartComponent :id="item.id" ref="echartComponent" :optionsData="item.optionsData"></echartComponent>
+      <slot>
+        <echartComponent
+          :id="item.id"
+          ref="echartComponent"
+          :optionsData="item.optionsData"
+          :item="item"
+          :key="item.id"
+          v-if="item.optionsData"
+        ></echartComponent>
       </slot>
       <div v-if="item.children">
         <tree-list :listData="item.children" v-bind="$attrs" v-on="$listeners"></tree-list>
@@ -51,10 +59,27 @@ export default {
     return {
       preventActiveBehavior: true,
       timer: null,
-      item: null
+      item: null,
+      treeData: this.listData
     }
   },
   methods: {
+    setTreeData (data) {
+      console.log(data)
+      this.treeData = data
+      this.$nextTick(() => {
+        console.log(this.getEchartComponents())
+        let echartsComponent = this.$refs.vdr
+        console.log(echartsComponent)
+        // echartsComponent.forEach(v => {
+        //   v.resizeFun()
+        // })
+      })
+      // let echartsComponent = this.getEchartComponents()
+      // echartsComponent.forEach(v => {
+      //   v.myChart.resize()
+      // })
+    },
     // 组合方法
     group () {
       // console.log("group")
