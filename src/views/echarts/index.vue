@@ -3,17 +3,20 @@
     <div class="left-container">
       <toolbar :rightBtn="rightBtn" :targetFunScreen="targetFunScreen"></toolbar>
       <div class="add-wrapper" @drop="drop" @dragover="allowDrop" ref="addWrapper" id="addWrapper">
-        <recursionItem
-          :listData="resizeBox"
-          ref="recursionItem"
-          @onActivated="onActivated"
-          @handleContextmenu="handleContextmenu"
+        <resizeBox
+          :item="item"
+          v-for="item in resizeBox"
+          :key="item.id"
           @onResize="onResize"
           @delFun="delFun"
           @onDrag="onDragFun"
-          :isGroupDisable="isGroupDisable"
-          @group="groupFun"
-        ></recursionItem>
+          @handleContextmenu="handleContextmenu"
+          @onActivated="onActivated"
+          @groupFun="groupFun"
+        >
+          <echartTemplate :id="item.id" ref="echartComponent" :optionsData="item.optionsData"></echartTemplate>
+        </resizeBox>
+        <Group :groupData="groupData" v-if="groupData.length>0"></Group>
       </div>
     </div>
     <div class="right-container">
@@ -23,19 +26,23 @@
 </template>
 <script>
 import toolbar from "./components/toolBar";
-import recursionItem from "./components/recursionItem"
+import echartTemplate from "./echartComponent/echartTemplate";
+import resizeBox from "./components/resizeBox";
 import { randomStr } from "@/utils";
 import rightTool from "./rightTool/index";
 import History from "./utils/history";
 import event from "./utils/event";
-import menu from "./utils/menu"
+import menu from "./utils/menu";
+import Group from "./components/group"
 export default {
   name: "echarts",
   mixins: [event, menu],
   components: {
     toolbar,
+    echartTemplate,
+    resizeBox,
     rightTool,
-    recursionItem
+    Group
   },
   provide () {
     return {
@@ -43,12 +50,9 @@ export default {
     };
   },
   computed: {
-    isGroupDisable () { // 是否禁用gruop菜单项
-      return this.currentSelectData.length <= 1;
+    currentSelectArr () {
+      return this.resizeBox.filter(v => v.active);
     },
-    currentSelectData () { // 当前选择的元素
-      return this.resizeBox.filter(v => v.active)
-    }
   },
   created () {
     this.$nextTick(() => {
@@ -70,7 +74,12 @@ export default {
       ],
       flag: false,
       currentItem: {}, // 当前的对象
-      targetFunScreen: null // 全屏展开的dom对象
+      targetFunScreen: null,
+      groupData: []
+      // groupData: [
+      //   { x: 100, y: 100, w: 500, h: 200, groupChildren: [{ x: 120, y: 110, w: 100, h: 100 }] },
+      //   { x: 400, y: 350, w: 200, h: 200, groupChildren: [] }
+      // ] // 组合的数据
     };
   },
   methods: {
@@ -89,7 +98,7 @@ export default {
       let styleOption = { x: x - elex, y: y - eley, id: uid, optionsData: data.optionsData };
       let boxOptions = Object.assign({ x: 0, y: 0, width: 300, height: 300 }, styleOption);
       let id = await this.createEchart(boxOptions);
-      let echartsComponents = this.$refs.recursionItem.getEchartComponents()
+      let echartsComponents = this.$refs.echartComponent;
       let targetEchart = echartsComponents.find(v => v.id === id);
       this.$store.commit("echart/setEchartArr", echartsComponents); // 设置当前echart对象集合
       targetEchart.resizeFun();
@@ -99,7 +108,8 @@ export default {
       return new Promise((resolve => {
         this.resizeBox.push({
           ...boxOptions,
-          active: false
+          active: false, // 活跃状态
+          isGroup: false // 是否已经组合了
         });
         // console.log(this.stack);
         this.stack.setState(this.resizeBox); // 设置历史记录
@@ -113,8 +123,7 @@ export default {
         }
         if (this.currentId.length === 0 || this.currentId !== data.id || this.targetEchart === null) {
           this.currentId = data.id;
-          let echartsComponents = this.$refs.recursionItem.getEchartComponents()
-          this.targetEchart = echartsComponents.find(v => v.id === data.id);
+          this.targetEchart = this.$refs.echartComponent.find(v => v.id === data.id);
         }
         this.targetEchart.resizeFun();
         this.stack.setState(this.resizeBox); // 设置历史记录
@@ -130,12 +139,10 @@ export default {
     // 选中元素
     onActivated (data) {
       this.currentItem = data;
-      console.log(data)
       this.$store.commit("echart/setCurrentTarget", data);
     },
     // 删除的方法
-    delFun (item) {
-      console.log(item)
+    delFun () {
       // console.log(this.currentSelectArr);
       // let ids = this.currentSelectArr.map(v => v.id) || [];
       this.resizeBox = this.resizeBox.filter(v => !v.active);
@@ -169,10 +176,9 @@ export default {
     },
     // 菜单事件
     handleContextmenu (item) {
-      // console.log(item);
-      // console.log(this.currentSelectArr);
-      this.currentItem = item;
-      this.$set(item, "active", true)
+      console.log(item);
+      console.log(this.currentSelectArr);
+      // this.currentItem = item;
       // let filterArr = this.resizeBox.filter(v => v.id !== this.currentItem.id);
       // filterArr.forEach(v => {
       //   this.$set(v, "active", false);
@@ -210,7 +216,6 @@ export default {
         console.log(e.button === 1);
         if (e.target.tagName === "CANVAS" && e.button === 0) { // 点击是图形的情况
           console.log("点击是图形的情况");
-          console.log(this.currentItem)
           let filterArr = this.resizeBox.filter(v => v.id !== this.currentItem.id);
           filterArr.forEach(v => {
             this.$set(v, "active", false);
@@ -252,7 +257,7 @@ export default {
     .add-wrapper {
       // width: 220px;
       width: 100%;
-      height: calc(100% - 45px);
+      height: calc(100% - 30px);
       position: relative;
     }
   }

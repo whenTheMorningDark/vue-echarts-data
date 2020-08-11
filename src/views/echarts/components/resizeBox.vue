@@ -17,11 +17,13 @@
       :prevent-deactivation="preventActiveBehavior"
       :parent="'.add-wrapper'"
       @activated="onActivated"
+      style="z-index:2"
     >
       <!-- v-contextmenu:contextmenu -->
       <slot></slot>
     </vdr>
     <v-contextmenu ref="contextmenu" @contextmenu="handleContextmenu">
+      <v-contextmenu-item @click="groupFun">组合</v-contextmenu-item>
       <v-contextmenu-item @click="delFun">删除</v-contextmenu-item>
     </v-contextmenu>
   </div>
@@ -53,6 +55,9 @@ export default {
 
   },
   methods: {
+    groupFun () {
+      this.$emit("groupFun")
+    },
     onResize (x, y, width, height) {
       this.item = Object.assign(this.item, { x, y, width, height });
       clearTimeout(this.timer);
