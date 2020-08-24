@@ -212,6 +212,8 @@ export default {
         // filterArr.forEach(v => {
         //   this.$store.commit("echart/setCurrentSelectArr", v);
         // });
+      } else if (e.button === 2) {
+        console.log("右键")
       } else {
         console.log(e.button === 1);
         if (e.target.tagName === "CANVAS" && e.button === 0) { // 点击是图形的情况
@@ -221,11 +223,19 @@ export default {
             this.$set(v, "active", false);
           });
           this.$store.commit("echart/setCurrentTarget", this.currentItem);
+        } else if (e.button === 0 && e.target.className === "group-item") {
+          setTimeout(() => {
+            console.log(this.currentItem)
+          }, 200)
         } else if (e.button === 0 && e.target.className === "add-wrapper") { // 只是点击空白addWrapper的情况
           console.log("只是点击空白addWrapper的情况");
           this.resizeBox.forEach(v => {
             this.$set(v, "active", false);
           });
+          this.groupData.forEach(v => {
+            this.$set(v, "active", false);
+          })
+          console.log(this.groupData)
           this.currentItem = {};
           this.$store.commit("echart/setCurrentTarget", this.currentItem);
           // this.$store.commit("echart/setCurrentSelectArr", []);

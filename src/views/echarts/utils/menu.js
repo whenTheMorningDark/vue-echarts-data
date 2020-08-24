@@ -1,6 +1,14 @@
-import { randomStr } from "@/utils";
-import { maxBy, minBy, cloneDeep } from "lodash";
-import { mapGetters } from "vuex";
+import {
+	randomStr
+} from "@/utils";
+import {
+	maxBy,
+	minBy,
+	cloneDeep
+} from "lodash";
+import {
+	mapGetters
+} from "vuex";
 export default {
 	computed: {
 		...mapGetters(["echartArr"]),
@@ -50,7 +58,6 @@ export default {
 					height: ychildMax.y + ychildMax.height - ychildMix.y,
 					x: minX,
 					y: minY,
-					groupChildren: [],
 					pId: "",
 				};
 				resolve(targetJson);

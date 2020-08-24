@@ -80,7 +80,10 @@ export default {
     },
     // 右键菜单
     handleContextmenu () {
-      this.$emit("handleContextmenu", this.item);
+      // this.$emit("handleContextmenu", this.item);
+      // console.log(this.item)
+      this.$set(this.item, "active", true)
+      this.$store.commit("echart/setCurrentTarget", this.item);
     },
     // // 点击其它区域取消active状态
     // onDeactivated () {

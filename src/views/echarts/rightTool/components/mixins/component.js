@@ -1,20 +1,34 @@
 /* eslint-disable indent */
-import { mapGetters } from "vuex";
-import { clearValues } from "../../../utils/utils";
+import {
+	mapGetters
+} from "vuex";
+import {
+	clearValues
+} from "../../../utils/utils";
 export default {
 	computed: {
 		...mapGetters(["currentTarget"]),
 		cDisabled() {
+			if (!this.dataInfo) {
+				return false
+			}
 			return !this.dataInfo.show;
 		},
 		cShowDisabled() {
+			if (!this.currentTarget) {
+				return false
+			}
 			return !Object.keys(this.currentTarget).length > 0;
 		},
 	},
 	methods: {
 		// 输入框改变的类型和值
 		changeFun(attr, type, value) {
-			this.$emit("change", { attr, type, value });
+			this.$emit("change", {
+				attr,
+				type,
+				value
+			});
 		},
 		setData(data) {
 			if (!data || data === null || Object.keys(data).length === 0) {

@@ -55,6 +55,9 @@ export default {
         //   return;
         // }
         console.log("出发");
+        if (!nVal) {
+          return;
+        }
         let data = nVal.optionsData ? nVal : {}
         this.$nextTick(() => {
           this.$refs.baseAttr[0].setData(data);
