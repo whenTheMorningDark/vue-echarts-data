@@ -34,8 +34,7 @@ export default {
 .group {
   .group-item {
     position: absolute;
-    background: red;
-    border: 1px solid black;
+    background: #3a8ee6;
     z-index: 1;
   }
 }
