@@ -1,7 +1,40 @@
 <template>
   <div class="tree-box">
-    <vdr
-      v-for="item of treeData"
+    <div class="tree-box-wrapper">
+      <vdr
+        v-for="item in listData"
+        :w="item.width"
+        :h="item.height"
+        :x="item.x"
+        :y="item.y"
+        :active.sync="item.active"
+        :parent="'.add-wrapper'"
+        :key="item.id"
+        :prevent-deactivation="preventActiveBehavior"
+        @activated="onActivated(item)"
+        v-contextmenu:contextmenu
+        @dragging="onDrag"
+        @resizing="onResize"
+        :class="parentCls(item)"
+        ref="vdr"
+      >
+        <echartComponent
+          :id="item.id"
+          ref="echartComponent"
+          :optionsData="item.optionsData"
+          :item="item"
+          :key="item.id"
+          v-if="item.optionsData"
+        ></echartComponent>
+      </vdr>
+    </div>
+    <tree-list :listData="subMenu" v-if="subMenu && subMenu.length>0"></tree-list>
+    <v-contextmenu ref="contextmenu" @contextmenu="handleContextmenu(item)">
+      <v-contextmenu-item @click="delFun(item)">删除</v-contextmenu-item>
+      <v-contextmenu-item @click="group">组合</v-contextmenu-item>
+    </v-contextmenu>
+    <!-- <vdr
+      v-for="item in listData"
       :w="item.width"
       :h="item.height"
       :x="item.x"
@@ -27,14 +60,14 @@
           v-if="item.optionsData"
         ></echartComponent>
       </slot>
-      <div v-if="item.children">
+      <div v-if="item.children" style="position:absolute;left:0;top:0">
         <tree-list :listData="item.children" v-bind="$attrs" v-on="$listeners"></tree-list>
       </div>
       <v-contextmenu ref="contextmenu" @contextmenu="handleContextmenu(item)">
         <v-contextmenu-item @click="delFun(item)">删除</v-contextmenu-item>
-        <v-contextmenu-item @click="group" :disabled="isGroupDisable">组合</v-contextmenu-item>
+        <v-contextmenu-item @click="group">组合</v-contextmenu-item>
       </v-contextmenu>
-    </vdr>
+    </vdr>-->
   </div>
 </template>
 
@@ -52,7 +85,19 @@ export default {
     }
   },
   name: "TreeList",
+  computed: {
+    subMenu () {
+      if (this.listData.length === 0) {
+        return []
+      }
+      if (this.listData[0].children && this.listData[0].children.length > 0) {
+        return this.listData[0].children
+      }
+      return []
+    }
+  },
   components: {
+    // eslint-disable-next-line vue/no-unused-components
     echartComponent
   },
   data () {
@@ -60,7 +105,8 @@ export default {
       preventActiveBehavior: true,
       timer: null,
       item: null,
-      treeData: this.listData
+      treeData: this.listData,
+
     }
   },
   methods: {
@@ -86,7 +132,7 @@ export default {
       this.$emit("group")
     },
     parentCls (item) {
-      if (!item.optionsData) {
+      if (item.pId === 0) {
         return "parentCls"
       }
       return "childCls"
@@ -139,5 +185,9 @@ export default {
 }
 .parentCls {
   background: red;
+  z-index: 1 !important;
+}
+.childCls {
+  z-index: 3 !important;
 }
 </style>

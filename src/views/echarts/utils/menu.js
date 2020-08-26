@@ -1,14 +1,6 @@
-import {
-	randomStr
-} from "@/utils";
-import {
-	maxBy,
-	minBy,
-	cloneDeep
-} from "lodash";
-import {
-	mapGetters
-} from "vuex";
+import { randomStr } from "@/utils";
+import { maxBy, minBy, cloneDeep } from "lodash";
+import { mapGetters } from "vuex";
 export default {
 	computed: {
 		...mapGetters(["echartArr"]),
@@ -17,8 +9,10 @@ export default {
 		async groupFun() {
 			console.log(this.currentSelectArr);
 			let data = await this.changeDataTree(this.currentSelectArr);
-			this.createGroup(data);
-			console.log(this.groupData);
+			this.resizeBox = [data];
+			console.log(data);
+			// this.createGroup(data);
+			// console.log(this.groupData);
 			// this.$refs.recursionItem.setTreeData(data);
 		},
 		// 创建group
@@ -58,7 +52,7 @@ export default {
 					height: ychildMax.y + ychildMax.height - ychildMix.y,
 					x: minX,
 					y: minY,
-					pId: "",
+					pId: 0,
 				};
 				resolve(targetJson);
 			});

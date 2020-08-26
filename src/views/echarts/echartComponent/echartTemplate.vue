@@ -1,11 +1,25 @@
 <template>
-  <div :id="id" style="width:100%;height:100%"></div>
+  <div :id="id" :style="cStyle"></div>
 </template>
 
 <script>
 import initMixins from "./mixins/init";
 export default {
-  mixins: [initMixins]
+  mixins: [initMixins],
+  props: {
+    item: {
+      type: Object,
+      default: () => ({})
+    }
+  },
+  computed: {
+    cStyle () {
+      return {
+        width: this.item.width + "px",
+        height: this.item.height + "px"
+      }
+    }
+  }
 };
 </script>
 

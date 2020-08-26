@@ -3,7 +3,8 @@
     <div class="left-container">
       <toolbar :rightBtn="rightBtn" :targetFunScreen="targetFunScreen"></toolbar>
       <div class="add-wrapper" @drop="drop" @dragover="allowDrop" ref="addWrapper" id="addWrapper">
-        <resizeBox
+        <recursionItem :listData="resizeBox" @onActivated="onActivated" @group="groupFun"></recursionItem>
+        <!-- <resizeBox
           :item="item"
           v-for="item in resizeBox"
           :key="item.id"
@@ -16,7 +17,7 @@
         >
           <echartTemplate :id="item.id" ref="echartComponent" :optionsData="item.optionsData"></echartTemplate>
         </resizeBox>
-        <Group :groupData="groupData" v-if="groupData.length>0"></Group>
+        <Group :groupData="groupData" v-if="groupData.length>0"></Group>-->
       </div>
     </div>
     <div class="right-container">
@@ -26,23 +27,25 @@
 </template>
 <script>
 import toolbar from "./components/toolBar";
-import echartTemplate from "./echartComponent/echartTemplate";
-import resizeBox from "./components/resizeBox";
+// import echartTemplate from "./echartComponent/echartTemplate";
+// import resizeBox from "./components/resizeBox";
 import { randomStr } from "@/utils";
 import rightTool from "./rightTool/index";
 import History from "./utils/history";
 import event from "./utils/event";
 import menu from "./utils/menu";
-import Group from "./components/group"
+// import Group from "./components/group"
+import recursionItem from "./components/recursionItem"
 export default {
   name: "echarts",
   mixins: [event, menu],
   components: {
     toolbar,
-    echartTemplate,
-    resizeBox,
+    // echartTemplate,
+    // resizeBox,
     rightTool,
-    Group
+    // Group,
+    recursionItem
   },
   provide () {
     return {
@@ -98,10 +101,12 @@ export default {
       let styleOption = { x: x - elex, y: y - eley, id: uid, optionsData: data.optionsData };
       let boxOptions = Object.assign({ x: 0, y: 0, width: 300, height: 300 }, styleOption);
       let id = await this.createEchart(boxOptions);
-      let echartsComponents = this.$refs.echartComponent;
-      let targetEchart = echartsComponents.find(v => v.id === id);
-      this.$store.commit("echart/setEchartArr", echartsComponents); // 设置当前echart对象集合
-      targetEchart.resizeFun();
+      console.log(id)
+      console.log(this.resizeBox)
+      // let echartsComponents = this.$refs.echartComponent;
+      // let targetEchart = echartsComponents.find(v => v.id === id);
+      // this.$store.commit("echart/setEchartArr", echartsComponents); // 设置当前echart对象集合
+      // targetEchart.resizeFun();
     },
     // 创建图形
     createEchart (boxOptions) {
@@ -138,6 +143,7 @@ export default {
     },
     // 选中元素
     onActivated (data) {
+      console.log(this.currentItem)
       this.currentItem = data;
       this.$store.commit("echart/setCurrentTarget", data);
     },
@@ -218,6 +224,7 @@ export default {
         console.log(e.button === 1);
         if (e.target.tagName === "CANVAS" && e.button === 0) { // 点击是图形的情况
           console.log("点击是图形的情况");
+          console.log(this.currentItem)
           let filterArr = this.resizeBox.filter(v => v.id !== this.currentItem.id);
           filterArr.forEach(v => {
             this.$set(v, "active", false);
