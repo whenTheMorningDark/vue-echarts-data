@@ -3,7 +3,16 @@
     <div class="left-container">
       <toolbar :rightBtn="rightBtn" :targetFunScreen="targetFunScreen"></toolbar>
       <div class="add-wrapper" @drop="drop" @dragover="allowDrop" ref="addWrapper" id="addWrapper">
-        <recursionItem :listData="resizeBox" @onActivated="onActivated" @group="groupFun"></recursionItem>
+        <template v-if="cResizeBox.length>0">
+          <recursionItem
+            v-for="item in cResizeBox"
+            :key="item.id"
+            :item="item"
+            @onActivated="onActivated"
+            @group="groupFun"
+          ></recursionItem>
+        </template>
+
         <!-- <resizeBox
           :item="item"
           v-for="item in resizeBox"
@@ -56,6 +65,10 @@ export default {
     currentSelectArr () {
       return this.resizeBox.filter(v => v.active);
     },
+    cResizeBox () {
+      console.log(this.resizeBox)
+      return this.resizeBox
+    }
   },
   created () {
     this.$nextTick(() => {

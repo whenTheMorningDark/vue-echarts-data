@@ -8,12 +8,15 @@ export default {
 	methods: {
 		async groupFun() {
 			console.log(this.currentSelectArr);
+			let targetId = this.currentSelectArr.map((s) => s.id);
+			let currentSouceData = cloneDeep(this.resizeBox);
 			let data = await this.changeDataTree(this.currentSelectArr);
-			this.resizeBox = [data];
-			console.log(data);
-			// this.createGroup(data);
-			// console.log(this.groupData);
-			// this.$refs.recursionItem.setTreeData(data);
+			currentSouceData = currentSouceData.filter(
+				(v) => !targetId.includes(v.id)
+			);
+			currentSouceData.push(data);
+			this.resizeBox = currentSouceData;
+			console.log(this.resizeBox);
 		},
 		// 创建group
 		createGroup(options) {
@@ -33,6 +36,7 @@ export default {
 				let id = randomStr(8);
 				let minX = Math.min(...targetArr.map((v) => v.x));
 				let minY = Math.min(...targetArr.map((v) => v.y));
+
 				targetArr.map((v) => {
 					v.pId = id; // 给每个图标都添加pId标识
 					v.active = false;

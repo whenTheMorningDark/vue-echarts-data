@@ -2,7 +2,6 @@
   <div class="tree-box">
     <div class="tree-box-wrapper">
       <vdr
-        v-for="item in listData"
         :w="item.width"
         :h="item.height"
         :x="item.x"
@@ -28,46 +27,14 @@
         ></echartComponent>
       </vdr>
     </div>
-    <tree-list :listData="subMenu" v-if="subMenu && subMenu.length>0"></tree-list>
+    <template v-if="item.children && item.children.length>0">
+      <!-- <span>12312312312</span> -->
+      <tree-list :item="sItem" v-for="sItem in item.children" :key="sItem.id"></tree-list>
+    </template>
     <v-contextmenu ref="contextmenu" @contextmenu="handleContextmenu(item)">
       <v-contextmenu-item @click="delFun(item)">删除</v-contextmenu-item>
       <v-contextmenu-item @click="group">组合</v-contextmenu-item>
     </v-contextmenu>
-    <!-- <vdr
-      v-for="item in listData"
-      :w="item.width"
-      :h="item.height"
-      :x="item.x"
-      :y="item.y"
-      :active.sync="item.active"
-      :parent="'.add-wrapper'"
-      :key="item.id"
-      :prevent-deactivation="preventActiveBehavior"
-      @activated="onActivated(item)"
-      v-contextmenu:contextmenu
-      @dragging="onDrag"
-      @resizing="onResize"
-      :class="parentCls(item)"
-      ref="vdr"
-    >
-      <slot>
-        <echartComponent
-          :id="item.id"
-          ref="echartComponent"
-          :optionsData="item.optionsData"
-          :item="item"
-          :key="item.id"
-          v-if="item.optionsData"
-        ></echartComponent>
-      </slot>
-      <div v-if="item.children" style="position:absolute;left:0;top:0">
-        <tree-list :listData="item.children" v-bind="$attrs" v-on="$listeners"></tree-list>
-      </div>
-      <v-contextmenu ref="contextmenu" @contextmenu="handleContextmenu(item)">
-        <v-contextmenu-item @click="delFun(item)">删除</v-contextmenu-item>
-        <v-contextmenu-item @click="group">组合</v-contextmenu-item>
-      </v-contextmenu>
-    </vdr>-->
   </div>
 </template>
 
@@ -75,9 +42,9 @@
 import echartComponent from "../echartComponent/echartTemplate"
 export default {
   props: {
-    listData: {
-      type: Array,
-      default: () => []
+    item: {
+      type: Object,
+      default: () => ({})
     },
     isGroupDisable: {
       type: Boolean,
@@ -87,13 +54,11 @@ export default {
   name: "TreeList",
   computed: {
     subMenu () {
-      if (this.listData.length === 0) {
-        return []
-      }
-      if (this.listData[0].children && this.listData[0].children.length > 0) {
-        return this.listData[0].children
+      if (this.item && this.item.children > 0) {
+        return this.item.children
       }
       return []
+
     }
   },
   components: {
@@ -104,9 +69,7 @@ export default {
     return {
       preventActiveBehavior: true,
       timer: null,
-      item: null,
       treeData: this.listData,
-
     }
   },
   methods: {
@@ -158,9 +121,18 @@ export default {
     },
     // 选中的状态
     onActivated (item) {
-      console.log("onActivated");
-      this.item = item
+      console.log(item)
+      // console.log("onActivated");
+      // this.item = item
       this.$emit("onActivated", item);
+    },
+    childActivated (item) {
+      // this.onActivated(item)
+      console.log(item)
+      this.$emit("onActivated", item);
+      // // console.log("onActivated");
+      // this.item = item
+      // this.$emit("onActivated", item);
     },
     handleContextmenu (item) {
       this.$emit("handleContextmenu", item);
