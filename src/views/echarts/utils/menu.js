@@ -9,9 +9,17 @@ export default {
 		// 组合方法
 		async groupFun() {
 			console.log(this.currentSelectArr);
-			let targetId = this.currentSelectArr.map((s) => s.id);
+			let targetArr = [];
+			this.currentSelectArr.forEach((v) => {
+				console.log(v);
+				let target = this.findPath(this.resizeBox, v.id);
+				console.log(target);
+				targetArr.push(target);
+			});
+			console.log(targetArr);
+			let targetId = targetArr.map((s) => s.id);
 			let currentSouceData = cloneDeep(this.resizeBox);
-			let data = await this.changeDataTree(this.currentSelectArr);
+			let data = await this.changeDataTree(targetArr);
 			currentSouceData = currentSouceData.filter(
 				(v) => !targetId.includes(v.id)
 			);
@@ -87,6 +95,25 @@ export default {
 				resolve(targetJson);
 			});
 		},
+		// 找到树的某个属性集合
+		findReseverTree(data, key, value) {
+			let result = []; // 结果的数据
+			if (data.length === 0) {
+				return result;
+			}
+			let statck = cloneDeep(data);
+			while (statck.length > 0) {
+				let shift = statck.shift();
+				// if(shift.pId)
+				if (shift[key] === value) {
+					result.push(shift);
+				}
+				if (shift.children && shift.children.length > 0) {
+					statck = statck.concat(...shift.children);
+				}
+			}
+			return result;
+		},
 		// 遍历树的所有数据
 		reseverTree(data, key, value) {
 			if (!data || !data.length) {
@@ -102,25 +129,33 @@ export default {
 		},
 		// 找到所有父节点的路径
 		findPath(menu, id) {
-			let ids;
-			const traverse = (subMenus, prev) => {
-				if (ids) {
-					return;
+			let currentNode = this.findCurrentNode(menu, id);
+			console.log(currentNode);
+			if (currentNode.pId === 0) {
+				return currentNode;
+			}
+			if (currentNode.pId) {
+				this.findPath(menu, currentNode.pId);
+			}
+		},
+		findCurrentNode(data, id) {
+			let result = {}; // 结果的数据
+			if (data.length === 0) {
+				return result;
+			}
+			let statck = cloneDeep(data);
+			while (statck.length > 0) {
+				let shift = statck.shift();
+				// if(shift.pId)
+				if (shift.id === id) {
+					result = shift;
+					return result;
 				}
-				if (!subMenus) {
-					return;
+				if (shift.children && shift.children.length > 0) {
+					statck = statck.concat(...shift.children);
 				}
-				subMenus.forEach((subMenu) => {
-					if (subMenu.id === id) {
-						ids = [...prev, id];
-						return;
-					}
-					traverse(subMenu._child, [...prev, subMenu.id]);
-				});
-			};
-
-			traverse(menu, []);
-			return ids;
+			}
+			return result;
 		},
 		// 找到当前父节点
 		findParentGroup(data, arr) {

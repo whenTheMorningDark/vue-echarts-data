@@ -50,7 +50,7 @@ export default {
   },
   computed: {
     currentSelectArr () {
-      return this.resizeBox.filter(v => v.active);
+      return this.findReseverTree(this.resizeBox, "active", true);
     },
     cResizeBox () {
       console.log(this.resizeBox)
@@ -114,7 +114,8 @@ export default {
         this.resizeBox.push({
           ...boxOptions,
           active: false, // 活跃状态
-          isGroup: false // 是否已经组合了
+          isGroup: false, // 是否已经组合了
+          pId: 0
         });
         // console.log(this.stack);
         this.stack.setState(this.resizeBox); // 设置历史记录
