@@ -30,8 +30,12 @@ export default {
 					let index = this.resizeBox.find((s) => s.id === v.id);
 					this.resizeBox.splice(index, 1);
 				} else {
-					// 不是父节点直接推进数组
-					targetArray.push(v);
+					// 如果选中的是不是父节点的情况,找到最顶层的父节点删除
+					console.log(this.findPath(this.resizeBox, v.id));
+					// 1.判断它有没有父节点
+					// 没有父节点直接推进数组
+					// 2.有父节点,则通过它的父节点的children删除它
+					// targetArray.push(v);
 				}
 			});
 			targetArray.forEach((v) => {
@@ -83,6 +87,42 @@ export default {
 				resolve(targetJson);
 			});
 		},
+		// 遍历树的所有数据
+		reseverTree(data, key, value) {
+			if (!data || !data.length) {
+				return;
+			}
+			for (let i = 0; i < data.length; i++) {
+				const childs = data[i].children;
+				this.$set(data[i], key, value);
+				if (childs && childs.length > 0) {
+					this.reseverTree(childs, key, value);
+				}
+			}
+		},
+		// 找到所有父节点的路径
+		findPath(menu, id) {
+			let ids;
+			const traverse = (subMenus, prev) => {
+				if (ids) {
+					return;
+				}
+				if (!subMenus) {
+					return;
+				}
+				subMenus.forEach((subMenu) => {
+					if (subMenu.id === id) {
+						ids = [...prev, id];
+						return;
+					}
+					traverse(subMenu._child, [...prev, subMenu.id]);
+				});
+			};
+
+			traverse(menu, []);
+			return ids;
+		},
+		// 找到当前父节点
 		findParentGroup(data, arr) {
 			let result = []; // 结果的数据
 			if (data.length === 0) {

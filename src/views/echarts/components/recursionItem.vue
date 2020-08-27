@@ -29,7 +29,13 @@
     </div>
     <template v-if="item.children && item.children.length>0">
       <!-- <span>12312312312</span> -->
-      <tree-list :item="sItem" v-for="sItem in item.children" :key="sItem.id"></tree-list>
+      <tree-list
+        :item="sItem"
+        v-for="sItem in item.children"
+        :key="sItem.id"
+        @handleContextmenu="childHandleContextmenu"
+        @onActivated="childActivated"
+      ></tree-list>
     </template>
     <v-contextmenu ref="contextmenu" @contextmenu="handleContextmenu(item)">
       <v-contextmenu-item @click="delFun(item)">删除</v-contextmenu-item>
@@ -99,7 +105,6 @@ export default {
       this.timer = setTimeout(() => {
         this.$emit("onResize", this.item);
       }, 200);
-      // throttle(this.emitFun(this.item), 2300);
     },
     onDrag (x, y) {
       console.log("onDrag");
@@ -112,19 +117,17 @@ export default {
     // 选中的状态
     onActivated (item) {
       console.log(item)
-      // console.log("onActivated");
-      // this.item = item
       this.$emit("onActivated", item);
     },
     childActivated (item) {
-      // this.onActivated(item)
       console.log(item)
       this.$emit("onActivated", item);
-      // // console.log("onActivated");
-      // this.item = item
-      // this.$emit("onActivated", item);
+    },
+    childHandleContextmenu (item) {
+      this.$emit("handleContextmenu", item);
     },
     handleContextmenu (item) {
+      console.log(item)
       this.$emit("handleContextmenu", item);
     },
     // 删除方法

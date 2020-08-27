@@ -11,6 +11,7 @@
             @onActivated="onActivated"
             @group="groupFun"
             @unGroup="unGroupFun"
+            @handleContextmenu="handleContextmenu"
           ></recursionItem>
         </template>
       </div>
@@ -142,19 +143,11 @@ export default {
     },
     // 选中元素
     onActivated (data) {
-      console.log(this.currentItem)
       this.currentItem = data;
-      this.$store.commit("echart/setCurrentTarget", data);
     },
     // 删除的方法
     delFun () {
-      // console.log(this.currentSelectArr);
-      // let ids = this.currentSelectArr.map(v => v.id) || [];
       this.resizeBox = this.resizeBox.filter(v => !v.active);
-      // console.log(this.resizeBox);
-      // this.$store.commit("echart/setCurrentSelectArr", []);
-      // this.currentItem = {};
-      // this.$store.commit("echart/setCurrentTarget", this.currentItem);
       this.stack.setState(this.resizeBox); // 设置历史记录
     },
     // 处理前进和撤销共同方法
@@ -182,15 +175,9 @@ export default {
     // 菜单事件
     handleContextmenu (item) {
       console.log(item);
-      console.log(this.currentSelectArr);
-      // this.currentItem = item;
-      // let filterArr = this.resizeBox.filter(v => v.id !== this.currentItem.id);
-      // filterArr.forEach(v => {
-      //   this.$set(v, "active", false);
-      // });
-      // let target = this.resizeBox.find(v => v.id === item.id) || {};
-      // this.$set(target, "active", true);
-      // this.$store.commit("echart/setCurrentTarget", this.currentItem);
+      // console.log(this.currentSelectArr);
+      this.currentItem = item;
+      // this.$store.commit("echart/setCurrentTarget", item);
     },
     // 全选
     selectAllFun () {
@@ -212,39 +199,28 @@ export default {
       if (e.button === 0 && e.ctrlKey) {
         console.log("c+");
         console.log(this.resizeBox);
-        // let filterArr = this.resizeBox.filter(v => v.active);
-        // this.$store.commit("echart/setCurrentSelectArr", filterArr);
-        // filterArr.forEach(v => {
-        //   this.$store.commit("echart/setCurrentSelectArr", v);
-        // });
-      } else if (e.button === 2) {
-        console.log("右键")
-      } else {
-        console.log(e.button === 1);
-        if (e.target.tagName === "CANVAS" && e.button === 0) { // 点击是图形的情况
-          console.log("点击是图形的情况");
+      } else if (e.button === 2 && !e.ctrlKey) { // 只是单纯的右键情况
+        setTimeout(() => {
+          console.log("右键")
           console.log(this.currentItem)
-          let filterArr = this.resizeBox.filter(v => v.id !== this.currentItem.id);
-          filterArr.forEach(v => {
-            this.$set(v, "active", false);
-          });
+          this.reseverTree(this.resizeBox, "active", false)
+          this.$set(this.currentItem, "active", true);
           this.$store.commit("echart/setCurrentTarget", this.currentItem);
-        } else if (e.button === 0 && e.target.className === "group-item") {
+        }, 200)
+      } else {
+        if (e.button === 0 && e.target.className !== "add-wrapper") { // 点击是图形的情况
+          console.log(e)
           setTimeout(() => {
             console.log(this.currentItem)
+            this.reseverTree(this.resizeBox, "active", false)
+            this.$set(this.currentItem, "active", true);
+            this.$store.commit("echart/setCurrentTarget", this.currentItem);
           }, 200)
         } else if (e.button === 0 && e.target.className === "add-wrapper") { // 只是点击空白addWrapper的情况
           console.log("只是点击空白addWrapper的情况");
-          this.resizeBox.forEach(v => {
-            this.$set(v, "active", false);
-          });
-          this.groupData.forEach(v => {
-            this.$set(v, "active", false);
-          })
-          console.log(this.groupData)
+          this.reseverTree(this.resizeBox, "active", false)
           this.currentItem = {};
           this.$store.commit("echart/setCurrentTarget", this.currentItem);
-          // this.$store.commit("echart/setCurrentSelectArr", []);
         }
       }
 
