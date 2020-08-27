@@ -10,23 +10,9 @@
             :item="item"
             @onActivated="onActivated"
             @group="groupFun"
+            @unGroup="unGroupFun"
           ></recursionItem>
         </template>
-
-        <!-- <resizeBox
-          :item="item"
-          v-for="item in resizeBox"
-          :key="item.id"
-          @onResize="onResize"
-          @delFun="delFun"
-          @onDrag="onDragFun"
-          @handleContextmenu="handleContextmenu"
-          @onActivated="onActivated"
-          @groupFun="groupFun"
-        >
-          <echartTemplate :id="item.id" ref="echartComponent" :optionsData="item.optionsData"></echartTemplate>
-        </resizeBox>
-        <Group :groupData="groupData" v-if="groupData.length>0"></Group>-->
       </div>
     </div>
     <div class="right-container">

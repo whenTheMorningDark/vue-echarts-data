@@ -6,6 +6,7 @@ export default {
 		...mapGetters(["echartArr"]),
 	},
 	methods: {
+		// 组合方法
 		async groupFun() {
 			console.log(this.currentSelectArr);
 			let targetId = this.currentSelectArr.map((s) => s.id);
@@ -18,9 +19,30 @@ export default {
 			this.resizeBox = currentSouceData;
 			console.log(this.resizeBox);
 		},
-		// 创建group
-		createGroup(options) {
-			this.groupData.push(options);
+		// 取消组合方法
+		unGroupFun() {
+			// 存在直接点击父元素的情况
+			let targetArray = [];
+			this.currentSelectArr.forEach((v) => {
+				if (v.pId === 0) {
+					// 如果选中的是父节点的情况
+					targetArray.push(...v.children);
+					let index = this.resizeBox.find((s) => s.id === v.id);
+					this.resizeBox.splice(index, 1);
+				} else {
+					// 不是父节点直接推进数组
+					targetArray.push(v);
+				}
+			});
+			targetArray.forEach((v) => {
+				v.pId = 0;
+				v.isGroup = false;
+				v.active = false;
+			});
+			console.log(targetArray);
+			this.resizeBox = targetArray;
+			// console.log(this.resizeBox);
+			// console.log(this.currentSelectArr);
 		},
 		changeDataTree(arr) {
 			console.log(arr);

@@ -34,6 +34,7 @@
     <v-contextmenu ref="contextmenu" @contextmenu="handleContextmenu(item)">
       <v-contextmenu-item @click="delFun(item)">删除</v-contextmenu-item>
       <v-contextmenu-item @click="group">组合</v-contextmenu-item>
+      <v-contextmenu-item @click="unGroup">取消组合</v-contextmenu-item>
     </v-contextmenu>
   </div>
 </template>
@@ -73,29 +74,18 @@ export default {
     }
   },
   methods: {
-    setTreeData (data) {
-      console.log(data)
-      this.treeData = data
-      this.$nextTick(() => {
-        console.log(this.getEchartComponents())
-        let echartsComponent = this.$refs.vdr
-        console.log(echartsComponent)
-        // echartsComponent.forEach(v => {
-        //   v.resizeFun()
-        // })
-      })
-      // let echartsComponent = this.getEchartComponents()
-      // echartsComponent.forEach(v => {
-      //   v.myChart.resize()
-      // })
-    },
     // 组合方法
     group () {
       // console.log("group")
       this.$emit("group")
     },
+    // 取消组合
+    unGroup () {
+      console.log("unGroup")
+      this.$emit("unGroup")
+    },
     parentCls (item) {
-      if (item.pId === 0) {
+      if (item.children && item.children.length > 0) {
         return "parentCls"
       }
       return "childCls"
