@@ -30,7 +30,7 @@ export default {
 		// 向下的方法
 		downFun() {
 			let y = this.currentTarget.y + this.steps;
-			this.$store.commit("echart/changeCurrentTagetAttr", {
+			this.$store.commit("echart/changeCurrentTargetAttr", {
 				key: "y",
 				value: y,
 			});
@@ -38,7 +38,7 @@ export default {
 		// 向上的方法
 		upFun() {
 			let y = this.currentTarget.y - this.steps;
-			this.$store.commit("echart/changeCurrentTagetAttr", {
+			this.$store.commit("echart/changeCurrentTargetAttr", {
 				key: "y",
 				value: y,
 			});
@@ -47,7 +47,7 @@ export default {
 		leftFun() {
 			let x = this.currentTarget.x - this.steps;
 			this.$set(this.currentTarget, "x", x);
-			this.$store.commit("echart/changeCurrentTagetAttr", {
+			this.$store.commit("echart/changeCurrentTargetAttr", {
 				key: "x",
 				value: x,
 			});
@@ -55,7 +55,7 @@ export default {
 		// 向右的方法
 		rightFun() {
 			let x = this.currentTarget.x + this.steps;
-			this.$store.commit("echart/changeCurrentTagetAttr", {
+			this.$store.commit("echart/changeCurrentTargetAttr", {
 				key: "x",
 				value: x,
 			});
@@ -63,8 +63,9 @@ export default {
 	},
 	mounted() {
 		window.addEventListener("keydown", (e) => this.move(e.keyCode));
-	},
-	destory() {
-		window.removeEventListener("keydown", (e) => this.move(e.keyCode));
-	},
+		// 销毁事件
+    this.$once('hook:beforeDestroy', () => {
+      window.removeEventListener("keydown", (e) => this.move(e.keyCode));
+    })
+	}
 };

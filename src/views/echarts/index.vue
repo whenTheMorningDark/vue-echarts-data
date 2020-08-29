@@ -138,12 +138,13 @@ export default {
     },
     // 处理拖拽后的图形
     onDragFun (data) {
-      console.log(data)
+      console.log('处理拖拽后的图形', data)
       this.stack.setState(this.resizeBox); // 设置历史记录
       // this.$store.commit("echart/setCurrentTarget", data);
     },
     // 选中元素
     onActivated (data) {
+      console.log('选中的元素', data)
       this.currentItem = data;
     },
     // 删除的方法
@@ -175,7 +176,7 @@ export default {
     },
     // 菜单事件
     handleContextmenu (item) {
-      console.log(item);
+      console.log('菜单事件', item);
       // console.log(this.currentSelectArr);
       this.currentItem = item;
       // this.$store.commit("echart/setCurrentTarget", item);

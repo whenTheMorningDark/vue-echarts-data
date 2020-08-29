@@ -66,11 +66,11 @@ const mutations = {
 	setEchartArr(state, arr) {
 		state.echartArr = arr;
 	},
-	changeCurrentTagetAttr(state, { key, value }) {
+	changeCurrentTargetAttr(state, { key, value }) {
 		state.currentTarget[key] = value;
 	},
 	// 改变当前对象的optionsData方法
-	changeCurrentTagetOptions(state, { attr, key, value }) {
+	changeCurrentTargetOptions(state, { attr, key, value }) {
 		let targetObj = state.currentTarget.optionsData[attr];
 		let paddingArr = {
 			paddingTop: 0,
