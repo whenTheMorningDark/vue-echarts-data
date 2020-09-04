@@ -13,6 +13,8 @@
             @unGroup="unGroupFun"
             @handleContextmenu="handleContextmenu"
             ref="recursionItem"
+            @delFun="delFun"
+            @onDrag="onDragFun"
           ></recursionItem>
         </template>
       </div>
@@ -152,8 +154,13 @@ export default {
       this.currentItem = data;
     },
     // 删除的方法
-    delFun () {
-      this.resizeBox = this.resizeBox.filter(v => !v.active);
+    delFun (item) {
+      console.log(item)
+      let parent = item.pId ? this.findCurrentNode(this.resizeBox, item.pId).children : this.resizeBox
+      let index = parent.findIndex(v => v.id === item.id)
+      this.resizeBox.splice(index, 1)
+      this.currentItem = {};
+      this.$store.commit("echart/setCurrentTarget", this.currentItem);
       this.stack.setState(this.resizeBox); // 设置历史记录
     },
     // 处理前进和撤销共同方法
@@ -161,11 +168,11 @@ export default {
       this.currentId = "";
       if (replaceArr && replaceArr.length >= 0) {
         this.resizeBox = replaceArr;
-        this.$nextTick(() => {
-          this.$refs.echartComponent.forEach(v => {
-            v.resizeFun();
-          });
-        });
+        // this.$nextTick(() => {
+        //   this.$refs.echartComponent.forEach(v => {
+        //     v.resizeFun();
+        //   });
+        // });
       }
     },
     // 撤销方法
