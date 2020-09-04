@@ -105,15 +105,18 @@ export default {
     },
     // 改变标题组件的值
     changeDataFun ({ attr, type, value }) {
-      this.$store.commit("echart/changeCurrentTagetOptions", { attr, key: type, value: value });
+      console.log(attr, type, value)
+      this.$store.commit("echart/changeCurrentTargetOptions", { attr, key: type, value: value });
     },
     // 改变基础属性的回调
     changeBaseAttrFun (type, value) {
-      this.$store.commit("echart/changeCurrentTagetAttr", { key: type, value: value });
+      this.$store.commit("echart/changeCurrentTargetAttr", { key: type, value: value });
       let widthHeightArr = ["width", "height"];
       let xYArr = ["x", "y"];
       if (widthHeightArr.includes(type)) {
-        this.root.onResize();
+        // this.root.onResize();
+        console.log(this.currentTarget)
+        this.$store.commit("echart/setResizeFun", this.currentTarget.id)
       } else if (xYArr.includes(type)) {
         this.root.onDragFun();
       }

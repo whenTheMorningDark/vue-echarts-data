@@ -103,8 +103,10 @@ export default {
       this.item = Object.assign(this.item, { x, y, width, height });
       clearTimeout(this.timer);
       this.timer = setTimeout(() => {
+        let id = this.item.id
+        this.$store.commit("echart/setResizeFun", id)
         this.$emit("onResize", this.item);
-      }, 200);
+      }, 20);
     },
     onDrag (x, y) {
       console.log("onDrag");

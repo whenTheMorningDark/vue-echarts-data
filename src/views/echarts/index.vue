@@ -12,6 +12,7 @@
             @group="groupFun"
             @unGroup="unGroupFun"
             @handleContextmenu="handleContextmenu"
+            ref="recursionItem"
           ></recursionItem>
         </template>
       </div>
@@ -102,11 +103,14 @@ export default {
       let boxOptions = Object.assign({ x: 0, y: 0, width: 300, height: 300 }, styleOption);
       let id = await this.createEchart(boxOptions);
       console.log(id)
-      console.log(this.resizeBox)
-      // let echartsComponents = this.$refs.echartComponent;
-      // let targetEchart = echartsComponents.find(v => v.id === id);
-      // this.$store.commit("echart/setEchartArr", echartsComponents); // 设置当前echart对象集合
-      // targetEchart.resizeFun();
+      this.$nextTick(() => {
+        let recursionItem = this.$refs.recursionItem;
+        let arr = []
+        recursionItem.forEach(v => {
+          arr.push(v.getEchartComponents())
+        })
+        this.$store.commit("echart/setEchartArr", arr)
+      })
     },
     // 创建图形
     createEchart (boxOptions) {
