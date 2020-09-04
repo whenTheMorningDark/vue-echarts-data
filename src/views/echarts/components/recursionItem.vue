@@ -106,13 +106,14 @@ export default {
         let id = this.item.id
         this.$store.commit("echart/setResizeFun", id)
         this.$emit("onResize", this.item);
-      }, 20);
+      }, 200);
     },
     onDrag (x, y) {
       console.log("onDrag");
       this.item = Object.assign(this.item, { x, y });
       clearTimeout(this.timer);
       this.timer = setTimeout(() => {
+        console.log(this.item)
         this.$emit("onDrag", this.item);
       }, 200);
     },

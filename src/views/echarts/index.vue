@@ -15,6 +15,7 @@
             ref="recursionItem"
             @delFun="delFun"
             @onDrag="onDragFun"
+            @onResize="onResize"
           ></recursionItem>
         </template>
       </div>
@@ -129,22 +130,29 @@ export default {
       }));
     },
     onResize (data) { // 处理resize变化后的图形
-      this.$nextTick(() => {
-        if (!data || Object.keys(data).length === 0) {
-          data = this.currentItem;
-        }
-        if (this.currentId.length === 0 || this.currentId !== data.id || this.targetEchart === null) {
-          this.currentId = data.id;
-          this.targetEchart = this.$refs.echartComponent.find(v => v.id === data.id);
-        }
-        this.targetEchart.resizeFun();
-        this.stack.setState(this.resizeBox); // 设置历史记录
-        // this.$store.commit("echart/setCurrentTarget", data);
-      });
+      console.log(this.resizeBox)
+      console.log(data)
+      this.stack.setState(this.resizeBox);
+      // this.$store.commit("echart/setCurrentTarget", data);
+
+      // this.$nextTick(() => {
+      //   if (!data || Object.keys(data).length === 0) {
+      //     data = this.currentItem;
+      //   }
+      //   if (this.currentId.length === 0 || this.currentId !== data.id || this.targetEchart === null) {
+      //     this.currentId = data.id;
+      //     this.targetEchart = this.$refs.echartComponent.find(v => v.id === data.id);
+      //   }
+      //   this.targetEchart.resizeFun();
+      //   console.log(this.resizeBox)
+      //   this.stack.setState(this.resizeBox); // 设置历史记录
+      // });
     },
     // 处理拖拽后的图形
     onDragFun (data) {
-      console.log('处理拖拽后的图形', data)
+      console.log('处理拖拽后的图形')
+      console.log(data)
+      console.log(this.resizeBox)
       this.stack.setState(this.resizeBox); // 设置历史记录
       // this.$store.commit("echart/setCurrentTarget", data);
     },
@@ -168,11 +176,20 @@ export default {
       this.currentId = "";
       if (replaceArr && replaceArr.length >= 0) {
         this.resizeBox = replaceArr;
-        // this.$nextTick(() => {
-        //   this.$refs.echartComponent.forEach(v => {
-        //     v.resizeFun();
-        //   });
-        // });
+        console.log(replaceArr)
+        this.reseverTree(this.resizeBox, "active", false)
+        this.$nextTick(() => {
+          let recursionItem = this.$refs.recursionItem;
+          let arr = []
+          recursionItem.forEach(v => {
+            arr.push(v.getEchartComponents())
+          })
+          this.$store.commit("echart/setEchartArr", arr)
+          this.$store.commit("echart/setCurrentTarget", {});
+          arr.forEach(v => {
+            this.$store.commit("echart/setResizeFun", v.id)
+          })
+        })
       }
     },
     // 撤销方法
